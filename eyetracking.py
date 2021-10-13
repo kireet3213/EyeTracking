@@ -56,7 +56,29 @@ if detect_face and face_box is not None:
     cv2.circle(image, (roi_x + col, roi_y + row), 10, (0, 255, 0), -1)
 
 else:
-    pass
+    eyes = eye_cascade.detectMultiScale(gray, 1.2, 3)
+    if len(eyes) == 2:
+        x, y, w, h = eyes[0]
+        row, col = tracker.find_eye_center(gray[y:y + h, x:x + w])
+        print row, col
+        cv2.circle(image, (x + col, y + row), 10, (255, 0, 0), -1)
+
+        x, y, w, h = eyes[1]
+        row, col = tracker.find_eye_center(gray[y:y + h, x:x + w])
+        print row, col
+
+        cv2.circle(image, (x + col, y + row), 10, (255, 0, 0), -1)
+
+    else:
+        row, col = tracker.find_eye_center(gray[:, 0:image.shape[1] / 2])
+        print row, col
+
+        cv2.circle(image, (col, row), 10, (0, 0, 255), -1)
+
+        row, col = tracker.find_eye_center(gray[:, image.shape[1] / 2:])
+        print row, col
+
+        cv2.circle(image, (image.shape[1] / 2 + col, row), 10, (0, 0, 255), -1)
 
 cv2.imshow("Output", utils.image_resize(image, height=600))
 cv2.waitKey()
