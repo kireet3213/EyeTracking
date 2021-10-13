@@ -59,4 +59,19 @@ def find_eye_center(image):
         index[0] * image.shape[0] / scaled_image.shape[0], index[1] * image.shape[1] / scaled_image.shape[1])
     return rescaled_index
 
+def compute_location_weight(c_row, c_col, weight, grad_x, grad_y):
+    output = np.zeros_like(weight)
+    for row in range(weight.shape[0]):
+        for col in range(weight.shape[1]):
+            if row == c_row and col == c_col:
+                continue
+            displacement_x = c_col - col
+            displacement_y = c_row - row
+            disp_magnitude = (displacement_x ** 2 + displacement_y ** 2) ** 0.5
+            displacement_x /= disp_magnitude
+            displacement_y /= disp_magnitude
+            dot_product = grad_x[row, col] * displacement_x + grad_y[row, col] * displacement_y
+            dot_product = max(0.0, dot_product)
+            output[row, col] = weight[row, col] * dot_product * dot_product
 
+    return output
